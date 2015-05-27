@@ -2,7 +2,11 @@
 var defaultKeywords = ["__"];
 
 var missingKeys = {};
-var i18n, keywords, debug, extensions;
+var i18n,
+  keywords,
+  debug,
+  excludes,
+  extensions;
 
 module.exports = function(i18next, options, callback) {
   i18n = i18next;
@@ -14,6 +18,7 @@ module.exports = function(i18next, options, callback) {
   missingKeys = {};
   debug = !!options.debug;
   extensions = options.extensions || [".js", ".jsx"];
+  excludes = options.excludes || ["node_modules", "bower_components"];
   var paths = options.paths;
 
   if(!Array.isArray(keywords)) {
@@ -96,9 +101,13 @@ function analyseTranslations(paths, callback) {
           if(err) {
             return next(err);
           }
-          files = files.map(function(file) {
-            return path.join(p, file);
-          });
+          files = files
+            .filter(function(file) {
+              return !(~excludes.indexOf(file));
+            })
+            .map(function(file) {
+              return path.join(p, file);
+            });
           analyseTranslations(files, next);
         });
       } else {
