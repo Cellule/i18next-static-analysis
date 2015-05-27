@@ -1,13 +1,17 @@
 {
   "name": "i18next-static-analysis",
   "version": "0.0.1",
-  "description": "",
+  "description": "Parses your javascript file and attempt to find call to i18next to validate them",
   "main": "index.js",
   "scripts": {
     "test": "node tests/index.js",
     "lint": "eslint-myrules lint ."
   },
   "author": "Michael Ferris",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Cellule/i18next-static-analysis.git"
+  },
   "license": "MIT",
   "dependencies": {
     "async": "^1.0.0",
