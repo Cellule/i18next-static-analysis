@@ -1,6 +1,6 @@
 {
   "name": "i18next-static-analysis",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Parses your javascript file and attempt to find call to i18next to validate them",
   "main": "index.js",
   "scripts": {
