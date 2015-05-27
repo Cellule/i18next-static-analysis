@@ -2,11 +2,20 @@
 var defaultKeywords = ["__"];
 
 var missingKeys = {};
-var i18n, keywords;
+var i18n, keywords, debug, extensions;
 
-module.exports = function(i18next, paths, _keywords) {
+module.exports = function(i18next, options, callback) {
   i18n = i18next;
-  keywords = _keywords || defaultKeywords;
+  if(typeof options === "function") {
+    callback = options;
+    options = {};
+  }
+  keywords = options.keywords || defaultKeywords;
+  missingKeys = {};
+  debug = !!options.debug;
+  extensions = options.extensions || [".js", ".jsx"];
+  var paths = options.paths;
+
   if(!Array.isArray(keywords)) {
     keywords = [keywords];
   }
@@ -19,11 +28,13 @@ module.exports = function(i18next, paths, _keywords) {
   }
 
   i18n.sync.postMissing = function(lng, ns, key, all) {
-    if(!missingKeys[all]) {
+    if(debug) {
       console.warn(
         "Missing localized key: %s::%s::%s.",
         lng, ns, key
       );
+    }
+    if(!missingKeys[all]) {
       missingKeys[all] = {
         lng: lng,
         ns: ns,
@@ -34,14 +45,33 @@ module.exports = function(i18next, paths, _keywords) {
     }
   };
 
-  function checkIfInit() {
-    if(!i18n.isInitialized()) {
-      setTimeout(checkIfInit, 500);
-    } else {
-      analyseTranslations(paths);
-    }
-  }
-  checkIfInit();
+  i18n.init({
+    sendMissing: true
+  }, function() {
+    analyseTranslations(paths, function(err) {
+      if(err) {
+        return callback(err);
+      }
+      for(var all in missingKeys) {
+        var keyInfo = missingKeys[all];
+        console.warn(
+          "Missing localized key: %s::%s::%s.",
+          keyInfo.lng, keyInfo.ns, keyInfo.key
+        );
+        for(var i in keyInfo.usage) {
+          var usage = keyInfo.usage[i];
+          console.warn(
+            "  %s:%d:%d",
+            usage.filename,
+            usage.node.loc.start.line,
+            usage.node.loc.start.column
+          );
+        }
+        console.warn("");
+      }
+      callback();
+    });
+  });
 };
 
 var babel = require("babel-core");
@@ -49,14 +79,18 @@ var fs = require("fs");
 var async = require("async");
 var path = require("path");
 
-function analyseTranslations(paths) {
+function analyseTranslations(paths, callback) {
   async.each(paths, function(p, next) {
     fs.stat(p, function(err, stats) {
       if(err) {
         return next(err);
       }
       if(stats.isFile()) {
-        setTimeout(analyseFile.bind(null, p), 10);
+        if(~extensions.indexOf(path.extname(p))) {
+          analyseFile(p, next);
+        } else {
+          next();
+        }
       } else if(stats.isDirectory()) {
         fs.readdir(p, function(err, files) {
           if(err) {
@@ -65,15 +99,17 @@ function analyseTranslations(paths) {
           files = files.map(function(file) {
             return path.join(p, file);
           });
-          setTimeout(analyseTranslations.bind(null, files), 10);
+          analyseTranslations(files, next);
         });
+      } else {
+        next();
       }
-      next();
     });
   }, function(err){
     if(err) {
-      return console.error(err);
+      console.error(err);
     }
+    callback(err);
   });
 }
 
@@ -82,9 +118,18 @@ function isi18nCallee(callee) {
   return ~keywords.indexOf(callee.name);
 }
 
-function analyseFile(filename) {
+function analyseFile(filename, callback) {
+  if(debug) {
+    console.log("Analysing file %s", filename);
+  }
   var code = fs.readFileSync(filename, {encoding: "utf8"});
-  var ast = babel.parse(code);
+  try {
+    var ast = babel.parse(code, {
+      locations: true
+    });
+  } catch(e) {
+    return callback(e);
+  }
   babel.traverse(ast, {
     CallExpression: {
       enter: function(node) {
@@ -108,9 +153,10 @@ function analyseFile(filename) {
               // TODO:: support more than literal values
               default:
                 console.warn(
-                  "Unsupported i18next call type at %s:%d",
+                  "Unsupported i18next call type at %s:%d:%d",
                   filename,
-                  node.start
+                  node.loc.start.line,
+                  node.loc.start.column
                 );
             }
           }
@@ -118,4 +164,5 @@ function analyseFile(filename) {
       }
     }
   });
+  callback();
 }

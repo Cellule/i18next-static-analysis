@@ -16,7 +16,7 @@ i18n.init({
   nsseparator: "::",
   resGetPath: path.join(__dirname, "locales", "__lng__", "__ns__.json5"),
   //debug:true,
-  sendMissing: true,
+  //sendMissing: true,
 }, function() {
   analyser(i18n, [path.join(__dirname, "src")], ["__"]);
   //require("./src/somefile");
