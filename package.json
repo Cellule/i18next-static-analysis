@@ -1,24 +1,39 @@
 {
   "name": "i18next-static-analysis",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Parses your javascript file and attempt to find call to i18next to validate them",
-  "main": "index.js",
-  "scripts": {
-    "test": "node tests/index.js",
-    "lint": "eslint-myrules lint ."
-  },
+  "main": "dist/index.js",
   "author": "Michael Ferris",
   "repository": {
     "type": "git",
     "url": "https://github.com/Cellule/i18next-static-analysis.git"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint --ext .js,.ts src test"
+  },
   "dependencies": {
-    "async": "^1.0.0",
-    "babel-core": "^5.4.7"
+    "babel-core": "^6.26.3"
   },
   "devDependencies": {
-    "cellule-eslint-myrules": "^2.0.0",
-    "i18next": "^1.9.0"
+    "@types/babel-core": "^6.25.7",
+    "@types/i18next": "^13.0.0",
+    "@types/jest": "^28.1.4",
+    "@types/node": "^16.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.30.5",
+    "@typescript-eslint/parser": "^5.30.5",
+    "eslint": "^8.19.0",
+    "i18next": "^21.8.13",
+    "jest": "^28.1.2",
+    "prettier": "^2.7.1",
+    "ts-jest": "^28.0.5",
+    "ts-node": "^10.8.2",
+    "typescript": "^4.7.4"
   }
 }
