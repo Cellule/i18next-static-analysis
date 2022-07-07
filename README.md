@@ -10,19 +10,19 @@ Uses [`babel`](https://babeljs.io/) for all parsing and traversing of your code 
 
 ## Usage
 ```javascript
-var path = require("path");
-var i18n = require("i18next");
-var analyser = require("./index"); // Path to i18next-static-analysis index
+const path = require("path");
+const i18n = require("i18next");
+const analyser = require("i18next-static-analysis");
 
 /**
  * @typedef {Object} options
- * @property {Boolean} debug - Optional | Default: true | Print debug logs
+ * @property {Boolean} debug - Optional | Default: false | Print debug logs
  * @property {String[]} excludes - Optional | Default: ["node_modules", "bower_components"] | Path to exclude
  * @property {String[]} extensions - Optional | Default: [".js", ".jsx"] | File extensions to be analyzed
  * @property {String | String[]} keywords - Optional | Default: ["__"] | Callee Keywords
  * @property {String | String[]} paths - Required | Paths to be analyzed
  */
-var options = {
+const options = {
   paths: [path.join(__dirname, "src")]
 };
 
@@ -48,8 +48,9 @@ i18n.init({
   nsseparator: "::",
   resGetPath: path.join(__dirname, "locales", "__lng__", "__ns__.json5"),
   }, function() {
-  analyser(i18n, options, callback);
-});
+    analyser(i18n, options, callback);
+  }
+);
 ```
 
 ## Demo
