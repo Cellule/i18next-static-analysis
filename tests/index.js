@@ -1,10 +1,20 @@
-var analyser = require("..");
 var path = require("path");
 var i18n = require("i18next");
+var analyser = require("..");
 
 module.exports = i18n.t;
 
+var options = {
+  paths: [path.join(__dirname, "src")]
+};
 
+function callback(err) {
+  if (err) {
+    throw new Error(err);
+  } else {
+    console.log("Successful Analysis");
+  }
+}
 
 i18n.init({
   lng: "en",
@@ -18,7 +28,6 @@ i18n.init({
   //debug:true,
   //sendMissing: true,
 }, function() {
-  analyser(i18n, [path.join(__dirname, "src")], ["__"]);
+  analyser(i18n, options, callback);
   //require("./src/somefile");
 });
-
