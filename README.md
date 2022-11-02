@@ -1,5 +1,14 @@
 # i18next-static-analysis
 
+# Looking for Contributors
+This project is currently unmaintained and very out of date
+
+I've moved on to different approach for static analysis using Typescript types.
+As such I do not have time to support/maintain/test this project.
+I hope to open-source my other solution in the future.
+
+## Description
+
 Attempts to analyse statically your code to find calls to `i18next` and validates them for all your supported languages.
 Provide the `i18next` instance and the path to your source file and wait for the report.
 
